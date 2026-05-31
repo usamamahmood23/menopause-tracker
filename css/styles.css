@@ -34,14 +34,15 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Sidebar brand label — only visible in the desktop sidebar */
-.sidebar-brand { display: none; }
-
-/* Symptom grid wrapper — flat on mobile, 2-col grid on desktop */
+/* Symptom grid wrapper — single-column stacking on all sizes */
 .symptoms-grid { display: block; }
 
-/* Content wrapper — transparent on mobile, grid cell on desktop */
-.content-wrapper { display: block; }
+/* Content wrapper — the centered max-width container on all sizes */
+.content-wrapper {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 20px 120px;
+}
 
 button {
   font-family: inherit;
@@ -61,10 +62,9 @@ input[type="text"], input[type="time"] {
 /* ============== Layout ============== */
 
 .app-header {
-  padding: 1.5rem 1.25rem 0.5rem;
+  padding: 0;
+  margin: 0 0 16px;
   text-align: left;
-  max-width: 720px;
-  margin: 0 auto;
 }
 .brand {
   font-size: 1.5rem;
@@ -80,9 +80,8 @@ input[type="text"], input[type="time"] {
 }
 
 .app-main {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 1rem 1.25rem 6rem;
+  padding: 0;
+  margin: 0;
 }
 
 .screen { display: none; }
@@ -106,11 +105,10 @@ input[type="text"], input[type="time"] {
 
 .card {
   background: #fff;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 1rem 1.1rem;
-  margin-bottom: 0.85rem;
-  box-shadow: var(--shadow);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 14px;
 }
 .card__title {
   display: block;
@@ -551,154 +549,20 @@ input[type="text"], input[type="time"] {
 }
 
 /* ============== Tablet / desktop ============== */
+/* On wider screens, the bottom nav becomes a floating, centered pill. */
 
 @media (min-width: 768px) {
-
-  /* ---------- Page-level grid ---------- */
-  body {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    grid-template-rows: auto 1fr;
-    min-height: 100vh;
-  }
-
-  .install-banner {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
-
-  /* ---------- Sidebar (sticky, full-height) ---------- */
   .tabbar {
-    grid-column: 1;
-    grid-row: 2;
-    position: sticky;
-    top: 0;
-    align-self: start;
-    height: 100vh;
-    flex-direction: column;
-    align-items: stretch;
-    background: #F5EFE8;
-    border-top: none;
-    border-right: 1px solid rgba(0, 0, 0, 0.06);
-    padding: 32px 20px;
-    gap: 4px;
-    z-index: 50;
-  }
-
-  .sidebar-brand {
-    display: block;
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--charcoal);
-    padding: 0 16px 24px;
-    letter-spacing: -0.01em;
-  }
-
-  .tab {
-    flex: 0 0 auto;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: 10px;
-    color: var(--charcoal);
-    min-height: auto;
-  }
-  .tab__label {
-    font-size: 0.95rem;
-  }
-  .tab:hover {
-    background: rgba(212, 165, 165, 0.12);
-    color: var(--charcoal);
-  }
-  .tab--active {
-    background: rgba(212, 165, 165, 0.20);
-    color: #8B4D4D;
-  }
-  .tab--active:hover {
-    background: rgba(212, 165, 165, 0.28);
-    color: #8B4D4D;
-  }
-
-  /* ---------- Main content ---------- */
-  .content-wrapper {
-    grid-column: 2;
-    grid-row: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    max-width: 480px;
     width: 100%;
-    background: var(--cream);
-  }
-
-  .app-header {
-    width: 100%;
-    max-width: 880px;
-    margin: 0;
-    padding: 48px 32px 0;
-    text-align: left;
-  }
-  .brand { font-size: 1.5rem; }
-
-  .app-main {
-    width: 100%;
-    max-width: 880px;
-    margin: 0;
-    padding: 24px 32px 48px;
-  }
-
-  /* Screen title sizing (desktop) */
-  .screen-title { font-size: 28px; font-weight: 500; }
-  .screen-date  { font-size: 14px; color: rgba(58, 58, 58, 0.6); margin-top: 2px; }
-
-  /* Card visual refinements on desktop (applied to all cards) */
-  .symptoms-grid > .card {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px 16px 0 0;
     background: #fff;
-    border-radius: 14px;
-    padding: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: none;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
   }
-  .symptoms-grid .card__title {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 6px;
-  }
-  .symptoms-grid .card__hint {
-    font-size: 13px;
-    color: rgba(58, 58, 58, 0.6);
-    margin: 0 0 14px;
-  }
-
-  /* ---------- Triggers / Notes / Save (full width on desktop) ---------- */
-  .card--collapsible,
-  .app-main > #save-btn,
-  .app-main > .save-status,
-  .card:has(#notes-input) {
-    width: 100%;
-  }
-
-  #save-btn {
-    display: block;
-    max-width: 280px;
-    margin-left: auto;
-    margin-right: 0;
-  }
-  .save-status { text-align: right; padding-right: 4px; }
-
-  /* Chart canvases get a bit more breathing room on desktop */
-  .chart-card canvas { height: 240px !important; }
-}
-
-/* ---------- Wider desktop: symptom cards in 2 columns ---------- */
-@media (min-width: 960px) {
-  .symptoms-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    margin-bottom: 16px;
-  }
-  .symptoms-grid > .card { margin-bottom: 0; }
 }
 
 
