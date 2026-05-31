@@ -21,6 +21,7 @@
     </div>
   </div>
 
+  <div class="content-wrapper">
   <!-- Header / brand -->
   <header class="app-header">
     <h1 class="brand">EaseTrack</h1>
@@ -35,6 +36,8 @@
         <h2 id="today-heading" class="screen-title">Today</h2>
         <p class="screen-date" id="today-date"></p>
       </div>
+
+      <div class="symptoms-grid">
 
       <!-- Hot flashes -->
       <div class="card" role="group" aria-labelledby="hf-label">
@@ -105,6 +108,8 @@
           <button class="chip" data-value="heavy" role="radio" aria-checked="false">Heavy</button>
         </div>
       </div>
+
+      </div><!-- /symptoms-grid -->
 
       <!-- Triggers (collapsible) -->
       <details class="card card--collapsible">
@@ -221,9 +226,11 @@
     </section>
 
   </main>
+  </div><!-- /content-wrapper -->
 
-  <!-- ============== BOTTOM NAV ============== -->
+  <!-- ============== BOTTOM NAV (mobile) / SIDEBAR (desktop) ============== -->
   <nav class="tabbar" aria-label="Primary">
+    <div class="sidebar-brand" aria-hidden="true">EaseTrack</div>
     <a href="#today" class="tab tab--active" data-screen="today">
       <span class="tab__icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
