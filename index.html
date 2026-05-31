@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#D4A5A5" />
+  <meta name="description" content="EaseTrack — a private, offline menopause symptom tracker. Your data stays on your device." />
+  <title>EaseTrack</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Install banner -->
+  <div id="install-banner" class="install-banner" hidden>
+    <span class="install-banner__text">Install EaseTrack for quick access offline</span>
+    <div class="install-banner__actions">
+      <button id="install-accept" class="btn btn--small">Install</button>
+      <button id="install-dismiss" class="btn btn--ghost btn--small" aria-label="Dismiss install prompt">Not now</button>
+    </div>
+  </div>
+
+  <!-- Header / brand -->
+  <header class="app-header">
+    <h1 class="brand">EaseTrack</h1>
+    <p class="brand-tagline" id="welcome-message">A calm space for your check-ins.</p>
+  </header>
+
+  <main class="app-main" id="app-main">
+
+    <!-- ============== TODAY SCREEN ============== -->
+    <section id="screen-today" class="screen screen--active" aria-labelledby="today-heading">
+      <div class="screen-head">
+        <h2 id="today-heading" class="screen-title">Today</h2>
+        <p class="screen-date" id="today-date"></p>
+      </div>
+
+      <!-- Hot flashes -->
+      <div class="card" role="group" aria-labelledby="hf-label">
+        <h3 class="card__title" id="hf-label">Hot flashes</h3>
+        <p class="card__hint">How many today?</p>
+        <div class="chip-row" data-field="hotFlashes" role="radiogroup" aria-labelledby="hf-label">
+          <button class="chip" data-value="0" role="radio" aria-checked="false">0</button>
+          <button class="chip" data-value="1-3" role="radio" aria-checked="false">1–3</button>
+          <button class="chip" data-value="4-6" role="radio" aria-checked="false">4–6</button>
+          <button class="chip" data-value="7+" role="radio" aria-checked="false">7+</button>
+        </div>
+      </div>
+
+      <!-- Night sweats -->
+      <div class="card" role="group" aria-labelledby="ns-label">
+        <h3 class="card__title" id="ns-label">Night sweats</h3>
+        <div class="chip-row" data-field="nightSweats" role="radiogroup" aria-labelledby="ns-label">
+          <button class="chip" data-value="none" role="radio" aria-checked="false">None</button>
+          <button class="chip" data-value="mild" role="radio" aria-checked="false">Mild</button>
+          <button class="chip" data-value="moderate" role="radio" aria-checked="false">Moderate</button>
+          <button class="chip" data-value="severe" role="radio" aria-checked="false">Severe</button>
+        </div>
+      </div>
+
+      <!-- Sleep -->
+      <div class="card" role="group" aria-labelledby="sleep-label">
+        <h3 class="card__title" id="sleep-label">Sleep quality</h3>
+        <div class="star-row" data-field="sleepQuality" role="radiogroup" aria-labelledby="sleep-label">
+          <button class="star" data-value="1" role="radio" aria-checked="false" aria-label="1 star">★</button>
+          <button class="star" data-value="2" role="radio" aria-checked="false" aria-label="2 stars">★</button>
+          <button class="star" data-value="3" role="radio" aria-checked="false" aria-label="3 stars">★</button>
+          <button class="star" data-value="4" role="radio" aria-checked="false" aria-label="4 stars">★</button>
+          <button class="star" data-value="5" role="radio" aria-checked="false" aria-label="5 stars">★</button>
+        </div>
+      </div>
+
+      <!-- Mood -->
+      <div class="card" role="group" aria-labelledby="mood-label">
+        <h3 class="card__title" id="mood-label">Mood</h3>
+        <div class="emoji-row" data-field="mood" role="radiogroup" aria-labelledby="mood-label">
+          <button class="emoji" data-value="great" role="radio" aria-checked="false" aria-label="Great">😊</button>
+          <button class="emoji" data-value="good" role="radio" aria-checked="false" aria-label="Good">🙂</button>
+          <button class="emoji" data-value="okay" role="radio" aria-checked="false" aria-label="Okay">😐</button>
+          <button class="emoji" data-value="low" role="radio" aria-checked="false" aria-label="Low">😔</button>
+          <button class="emoji" data-value="very-low" role="radio" aria-checked="false" aria-label="Very low">😢</button>
+        </div>
+      </div>
+
+      <!-- Energy -->
+      <div class="card" role="group" aria-labelledby="energy-label">
+        <h3 class="card__title" id="energy-label">Energy level</h3>
+        <div class="bar-row" data-field="energy" role="radiogroup" aria-labelledby="energy-label">
+          <button class="bar-step" data-value="1" role="radio" aria-checked="false" aria-label="Energy 1 of 5"></button>
+          <button class="bar-step" data-value="2" role="radio" aria-checked="false" aria-label="Energy 2 of 5"></button>
+          <button class="bar-step" data-value="3" role="radio" aria-checked="false" aria-label="Energy 3 of 5"></button>
+          <button class="bar-step" data-value="4" role="radio" aria-checked="false" aria-label="Energy 4 of 5"></button>
+          <button class="bar-step" data-value="5" role="radio" aria-checked="false" aria-label="Energy 5 of 5"></button>
+        </div>
+      </div>
+
+      <!-- Brain fog -->
+      <div class="card" role="group" aria-labelledby="bf-label">
+        <h3 class="card__title" id="bf-label">Brain fog</h3>
+        <div class="chip-row" data-field="brainFog" role="radiogroup" aria-labelledby="bf-label">
+          <button class="chip" data-value="none" role="radio" aria-checked="false">None</button>
+          <button class="chip" data-value="mild" role="radio" aria-checked="false">Mild</button>
+          <button class="chip" data-value="moderate" role="radio" aria-checked="false">Moderate</button>
+          <button class="chip" data-value="heavy" role="radio" aria-checked="false">Heavy</button>
+        </div>
+      </div>
+
+      <!-- Triggers (collapsible) -->
+      <details class="card card--collapsible">
+        <summary class="card__title">Possible triggers (optional)</summary>
+        <p class="card__hint">Tap any that apply today.</p>
+        <div class="chip-row chip-row--wrap" data-field="triggers" role="group">
+          <button class="chip chip--toggle" data-value="caffeine" aria-pressed="false">Caffeine</button>
+          <button class="chip chip--toggle" data-value="alcohol" aria-pressed="false">Alcohol</button>
+          <button class="chip chip--toggle" data-value="spicy" aria-pressed="false">Spicy food</button>
+          <button class="chip chip--toggle" data-value="stress" aria-pressed="false">Stress</button>
+          <button class="chip chip--toggle" data-value="exercise" aria-pressed="false">Exercise</button>
+          <button class="chip chip--toggle" data-value="poor-sleep" aria-pressed="false">Poor sleep</button>
+          <button class="chip chip--toggle" data-value="hormone-meds" aria-pressed="false">Hormone meds taken</button>
+        </div>
+      </details>
+
+      <!-- Notes -->
+      <div class="card">
+        <label class="card__title" for="notes-input">Notes</label>
+        <input type="text" id="notes-input" class="text-input" placeholder="Anything you'd like to remember…" />
+      </div>
+
+      <button id="save-btn" class="btn btn--primary btn--full">Save today's check-in</button>
+      <p id="save-status" class="save-status" aria-live="polite"></p>
+    </section>
+
+    <!-- ============== HISTORY SCREEN ============== -->
+    <section id="screen-history" class="screen" aria-labelledby="history-heading" hidden>
+      <div class="screen-head">
+        <h2 id="history-heading" class="screen-title">History</h2>
+      </div>
+      <div id="history-list" class="history-list"></div>
+      <p id="history-empty" class="empty-state" hidden>No check-ins yet. Start with today.</p>
+    </section>
+
+    <!-- ============== TRENDS SCREEN ============== -->
+    <section id="screen-trends" class="screen" aria-labelledby="trends-heading" hidden>
+      <div class="screen-head">
+        <h2 id="trends-heading" class="screen-title">Trends</h2>
+      </div>
+
+      <div id="insight-box" class="insight" hidden></div>
+
+      <div class="range-row" role="radiogroup" aria-label="Time range">
+        <button class="chip range-chip" data-range="7" role="radio" aria-checked="true">7 days</button>
+        <button class="chip range-chip" data-range="30" role="radio" aria-checked="false">30 days</button>
+        <button class="chip range-chip" data-range="90" role="radio" aria-checked="false">90 days</button>
+      </div>
+
+      <div id="trends-empty" class="empty-state" hidden>Log a few days to see your trends here.</div>
+
+      <div id="trends-content">
+        <div class="card chart-card">
+          <h3 class="card__title">Hot flashes</h3>
+          <canvas id="chart-hotflashes" aria-label="Hot flashes over time"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3 class="card__title">Sleep quality</h3>
+          <canvas id="chart-sleep" aria-label="Sleep quality over time"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3 class="card__title">Mood</h3>
+          <canvas id="chart-mood" aria-label="Mood over time"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3 class="card__title">Energy</h3>
+          <canvas id="chart-energy" aria-label="Energy over time"></canvas>
+        </div>
+        <div class="card" id="trigger-correlations">
+          <h3 class="card__title">Trigger patterns</h3>
+          <div id="trigger-corr-body" class="trigger-corr"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== SETTINGS SCREEN ============== -->
+    <section id="screen-settings" class="screen" aria-labelledby="settings-heading" hidden>
+      <div class="screen-head">
+        <h2 id="settings-heading" class="screen-title">Settings</h2>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">Daily reminder</h3>
+        <p class="card__hint">Optional gentle nudge to check in.</p>
+        <label class="switch">
+          <input type="checkbox" id="reminder-toggle" />
+          <span class="switch__track" aria-hidden="true"></span>
+          <span class="switch__label">Enable reminder</span>
+        </label>
+        <div id="reminder-time-row" hidden>
+          <label for="reminder-time" class="card__hint">Time</label>
+          <input type="time" id="reminder-time" class="text-input" value="20:00" />
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">Your data</h3>
+        <p class="card__hint">Everything is stored only on this device.</p>
+        <button id="export-btn" class="btn btn--secondary btn--full">Export as JSON</button>
+        <label for="import-input" class="btn btn--secondary btn--full" style="margin-top: 0.5rem; text-align: center; cursor: pointer;">Import from JSON</label>
+        <input type="file" id="import-input" accept="application/json" hidden />
+        <button id="clear-btn" class="btn btn--danger btn--full" style="margin-top: 0.5rem;">Clear all data</button>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">About</h3>
+        <p class="about-text">
+          EaseTrack stores all your entries directly on this device. No account, no cloud, no tracking.
+        </p>
+        <p class="about-text about-text--muted">
+          EaseTrack helps you track symptoms. It is not medical advice. Talk to a healthcare provider about your health.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============== BOTTOM NAV ============== -->
+  <nav class="tabbar" aria-label="Primary">
+    <a href="#today" class="tab tab--active" data-screen="today">
+      <span class="tab__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
+      </span>
+      <span class="tab__label">Today</span>
+    </a>
+    <a href="#history" class="tab" data-screen="history">
+      <span class="tab__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </span>
+      <span class="tab__label">History</span>
+    </a>
+    <a href="#trends" class="tab" data-screen="trends">
+      <span class="tab__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+      </span>
+      <span class="tab__label">Trends</span>
+    </a>
+    <a href="#settings" class="tab" data-screen="settings">
+      <span class="tab__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1A2 2 0 1 1 4.3 17l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </span>
+      <span class="tab__label">Settings</span>
+    </a>
+  </nav>
+
+  <!-- Confirm dialog -->
+  <div id="confirm-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal__panel">
+      <h3 id="confirm-title" class="modal__title">Clear all data?</h3>
+      <p class="modal__body">This will permanently remove every check-in stored on this device. This cannot be undone.</p>
+      <div class="modal__actions">
+        <button id="confirm-cancel" class="btn btn--ghost">Cancel</button>
+        <button id="confirm-ok" class="btn btn--danger">Clear everything</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail / edit modal -->
+  <div id="detail-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="detail-title">
+    <div class="modal__panel">
+      <h3 id="detail-title" class="modal__title">Check-in</h3>
+      <div id="detail-body" class="modal__body"></div>
+      <div class="modal__actions">
+        <button id="detail-close" class="btn btn--ghost">Close</button>
+        <button id="detail-edit" class="btn btn--primary">Edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js via CDN (cached by SW after first load) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <script src="js/storage.js" defer></script>
+  <script src="js/charts.js" defer></script>
+  <script src="js/reminders.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
