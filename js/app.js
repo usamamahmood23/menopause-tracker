@@ -12,6 +12,19 @@
   let editingDate = null; // null = today; YYYY-MM-DD when editing a past entry.
   let currentRange = 7;
 
+  // Onboarding state: mode 'first-time' (full 4 screens) or 'edit' (screens 2–4).
+  const STAGE_LABELS = {
+    perimenopause: 'Perimenopause',
+    menopause: 'Menopause',
+    postmenopause: 'Postmenopause',
+    not_sure: 'Not sure'
+  };
+  let onboarding = {
+    mode: null,
+    step: 1,
+    data: { name: '', age: null, stage: null }
+  };
+
   // ---------- Date helpers ----------
   function formatLongDate(dateKey) {
     const d = new Date(dateKey + 'T00:00:00');
@@ -351,13 +364,26 @@
       modal.hidden = false;
       document.getElementById('confirm-cancel').onclick = () => { modal.hidden = true; };
       document.getElementById('confirm-ok').onclick = () => {
-        EaseStorage.clearAll();
+        EaseStorage.clearAll(); // wipes entries + profile
         modal.hidden = true;
         refreshToday();
         refreshHistory();
         refreshTrends();
-        flashStatus('All data cleared.');
+        refreshSettingsProfile();
+        applyGreeting();
+        // Re-show onboarding since the profile is now gone.
+        showOnboarding('first-time');
       };
+    });
+
+    // Edit profile re-opens the onboarding starting at screen 2, prefilled.
+    document.getElementById('edit-profile-btn').addEventListener('click', () => {
+      const profile = EaseStorage.getProfile() || {};
+      showOnboarding('edit', {
+        name: profile.name || '',
+        age: profile.age != null ? profile.age : null,
+        stage: profile.stage || null
+      });
     });
   }
 
@@ -376,6 +402,7 @@
     if (name === 'today') refreshToday();
     if (name === 'history') refreshHistory();
     if (name === 'trends') refreshTrends();
+    if (name === 'settings') refreshSettingsProfile();
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
@@ -430,6 +457,204 @@
     });
   }
 
+  // ---------- Greeting (uses saved profile) ----------
+  function timeBasedGreeting() {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+  // Update the brand <h1> to a personalized greeting (or "EaseTrack" if no profile).
+  function applyGreeting() {
+    const profile = EaseStorage.getProfile();
+    const brand = document.querySelector('.brand');
+    if (!brand) return;
+    if (profile && profile.name) {
+      brand.textContent = `${timeBasedGreeting()}, ${profile.name}`;
+    } else {
+      brand.textContent = 'EaseTrack';
+    }
+  }
+
+  // ---------- Settings: Profile section ----------
+  function refreshSettingsProfile() {
+    const card = document.getElementById('profile-card');
+    if (!card) return;
+    const profile = EaseStorage.getProfile();
+    if (!profile) {
+      card.hidden = true;
+      return;
+    }
+    card.hidden = false;
+    document.getElementById('profile-name').textContent = profile.name || '—';
+    document.getElementById('profile-age').textContent =
+      (profile.age != null && profile.age !== '') ? String(profile.age) : 'Not set';
+    document.getElementById('profile-stage').textContent = STAGE_LABELS[profile.stage] || '—';
+  }
+
+  // ---------- Onboarding ----------
+  // Show overlay, hide main app. `mode` is 'first-time' or 'edit'.
+  function showOnboarding(mode, prefill) {
+    onboarding.mode = mode;
+    onboarding.step = mode === 'edit' ? 2 : 1;
+    onboarding.data = {
+      name: prefill?.name || '',
+      age: (prefill && prefill.age != null) ? prefill.age : null,
+      stage: prefill?.stage || null
+    };
+
+    // Reflect data in inputs / option buttons
+    const nameInput = document.getElementById('ob-name');
+    const ageInput = document.getElementById('ob-age');
+    if (nameInput) nameInput.value = onboarding.data.name;
+    if (ageInput) ageInput.value = onboarding.data.age != null ? onboarding.data.age : '';
+    document.querySelectorAll('.onboarding__option').forEach(opt => {
+      const match = opt.dataset.value === onboarding.data.stage;
+      opt.classList.toggle('onboarding__option--selected', match);
+      opt.setAttribute('aria-checked', match ? 'true' : 'false');
+    });
+
+    document.getElementById('onboarding').hidden = false;
+    document.body.classList.add('onboarding-active');
+    renderOnboardingStep();
+  }
+
+  function hideOnboarding() {
+    document.getElementById('onboarding').hidden = true;
+    document.body.classList.remove('onboarding-active');
+  }
+
+  // Show only the current step's sub-section; update progress pills; manage focus.
+  function renderOnboardingStep() {
+    document.querySelectorAll('.onboarding__screen').forEach(s => {
+      s.hidden = parseInt(s.dataset.step, 10) !== onboarding.step;
+    });
+    document.querySelectorAll('.onboarding__pill').forEach((pill, i) => {
+      pill.classList.toggle('onboarding__pill--filled', i < onboarding.step);
+    });
+    const prog = document.querySelector('.onboarding__progress');
+    if (prog) prog.setAttribute('aria-valuenow', String(onboarding.step));
+
+    // In edit mode at step 2, swap the "back" link to a cancel that closes the overlay.
+    const step2Back = document.querySelector('.onboarding__screen[data-step="2"] .onboarding__back');
+    if (step2Back) {
+      step2Back.textContent = (onboarding.mode === 'edit') ? 'Cancel' : '← Back';
+    }
+
+    updateContinueState();
+
+    // Focus the relevant input when entering a step (skip on welcome).
+    setTimeout(() => {
+      const current = document.querySelector(`.onboarding__screen[data-step="${onboarding.step}"]`);
+      if (!current) return;
+      const focusable = current.querySelector('input, .onboarding__option, .onboarding__continue');
+      if (focusable) focusable.focus({ preventScroll: false });
+    }, 30);
+  }
+
+  // Enable/disable the Continue/Finish button based on validation rules for the step.
+  function updateContinueState() {
+    const screen = document.querySelector(`.onboarding__screen[data-step="${onboarding.step}"]`);
+    if (!screen) return;
+    const btn = screen.querySelector('[data-action="next"], [data-action="finish"]');
+    if (!btn) return;
+    let valid = true;
+    if (onboarding.step === 2) valid = onboarding.data.name.trim().length > 0;
+    if (onboarding.step === 4) valid = !!onboarding.data.stage;
+    // Steps 1 (welcome) and 3 (age — optional) are always valid.
+    btn.disabled = !valid;
+  }
+
+  function onboardingNext() {
+    if (onboarding.step < 4) {
+      onboarding.step++;
+      renderOnboardingStep();
+    }
+  }
+
+  function onboardingBack() {
+    // In edit mode at step 2, "Back" closes the overlay (cancel edit).
+    if (onboarding.step === 2 && onboarding.mode === 'edit') {
+      hideOnboarding();
+      return;
+    }
+    if (onboarding.step > 1) {
+      onboarding.step--;
+      renderOnboardingStep();
+    }
+  }
+
+  function finishOnboarding() {
+    if (!onboarding.data.stage) return; // safety: button should be disabled
+    const profile = {
+      name: onboarding.data.name.trim(),
+      age: onboarding.data.age,
+      stage: onboarding.data.stage,
+      onboardedAt: new Date().toISOString()
+    };
+    EaseStorage.setProfile(profile);
+    const wasEdit = onboarding.mode === 'edit';
+    hideOnboarding();
+    applyGreeting();
+    refreshSettingsProfile();
+    if (wasEdit) {
+      showScreen('settings');
+    } else {
+      showScreen('today');
+    }
+  }
+
+  function initOnboarding() {
+    const nameInput = document.getElementById('ob-name');
+    const ageInput = document.getElementById('ob-age');
+
+    nameInput.addEventListener('input', () => {
+      onboarding.data.name = nameInput.value;
+      updateContinueState();
+    });
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && onboarding.data.name.trim().length > 0) {
+        e.preventDefault();
+        onboardingNext();
+      }
+    });
+
+    ageInput.addEventListener('input', () => {
+      const v = ageInput.value;
+      onboarding.data.age = v === '' ? null : parseInt(v, 10);
+      updateContinueState();
+    });
+    ageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onboardingNext();
+      }
+    });
+
+    document.querySelectorAll('.onboarding__option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.onboarding__option').forEach(o => {
+          o.classList.remove('onboarding__option--selected');
+          o.setAttribute('aria-checked', 'false');
+        });
+        opt.classList.add('onboarding__option--selected');
+        opt.setAttribute('aria-checked', 'true');
+        onboarding.data.stage = opt.dataset.value;
+        updateContinueState();
+      });
+    });
+
+    // Single delegated handler for next / back / finish actions inside the overlay.
+    document.getElementById('onboarding').addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]');
+      if (!target) return;
+      const action = target.dataset.action;
+      if (action === 'next') onboardingNext();
+      else if (action === 'back') onboardingBack();
+      else if (action === 'finish') finishOnboarding();
+    });
+  }
+
   // ---------- Service worker ----------
   function registerSW() {
     if ('serviceWorker' in navigator) {
@@ -446,12 +671,21 @@
     initTodayScreen();
     initTrendsScreen();
     initSettingsScreen();
+    initOnboarding();
     initNav();
     initInstallBanner();
     registerSW();
 
-    const initial = (location.hash || '#today').slice(1);
-    showScreen(['today', 'history', 'trends', 'settings'].includes(initial) ? initial : 'today');
+    // First-run check: no profile → show onboarding; otherwise route normally.
+    const profile = EaseStorage.getProfile();
+    if (!profile) {
+      showOnboarding('first-time');
+    } else {
+      applyGreeting();
+      refreshSettingsProfile();
+      const initial = (location.hash || '#today').slice(1);
+      showScreen(['today', 'history', 'trends', 'settings'].includes(initial) ? initial : 'today');
+    }
 
     // Apply any saved reminder.
     try { EaseReminders.apply(); } catch (_) {}

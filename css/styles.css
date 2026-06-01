@@ -41,7 +41,7 @@ html, body {
 .content-wrapper {
   max-width: 680px;
   margin: 0 auto;
-  padding: 32px 20px 120px;
+  padding: 32px 20px 140px;
 }
 
 button {
@@ -319,16 +319,30 @@ input[type="text"], input[type="time"] {
   min-height: 1.2em;
 }
 
-/* ============== Bottom tab bar ============== */
+/* ============== Bottom tab bar (floating, centered at all sizes) ============== */
 
 .tabbar {
   position: fixed;
-  left: 0; right: 0; bottom: 0;
-  display: flex;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
   background: #fff;
-  border-top: 1px solid var(--line);
-  padding: 0.35rem 0 calc(0.35rem + env(safe-area-inset-bottom));
-  z-index: 50;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
+  border-radius: 16px 16px 0 0;
+  z-index: 100;
+  padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: space-around;
+}
+/* Mobile: edge-to-edge */
+@media (max-width: 767px) {
+  .tabbar {
+    max-width: 100%;
+    border-radius: 0;
+  }
 }
 .tab {
   flex: 1;
@@ -548,24 +562,245 @@ input[type="text"], input[type="time"] {
   font-style: italic;
 }
 
-/* ============== Tablet / desktop ============== */
-/* On wider screens, the bottom nav becomes a floating, centered pill. */
+/* ============== Accessible utilities ============== */
 
-@media (min-width: 768px) {
-  .tabbar {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    max-width: 480px;
-    width: 100%;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 16px 16px 0 0;
-    background: #fff;
-    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
-  }
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
+/* ============== Profile card (Settings) ============== */
 
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 0.95rem;
+}
+.profile-row:last-child {
+  border-bottom: none;
+}
+.profile-row__label {
+  color: var(--charcoal-soft);
+}
+
+/* ============== Onboarding overlay ============== */
+
+/* Lock body scroll while onboarding is open. */
+body.onboarding-active {
+  overflow: hidden;
+}
+
+.onboarding {
+  position: fixed;
+  inset: 0;
+  background: #FAF6F2;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+.onboarding[hidden] {
+  display: none;
+}
+
+.onboarding__card {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 4px 24px rgba(58, 58, 58, 0.06);
+}
+
+.onboarding__progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 28px;
+}
+.onboarding__pill {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: #EAE2D9;
+  transition: background 200ms ease;
+}
+.onboarding__pill--filled {
+  background: var(--rose);
+}
+
+/* Each sub-screen fades in when revealed */
+.onboarding__screen {
+  animation: ob-fade-in 200ms ease;
+}
+.onboarding__screen[hidden] {
+  display: none;
+}
+@keyframes ob-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.onboarding__icon {
+  display: block;
+  margin: 8px auto 24px;
+  width: 64px;
+  height: 64px;
+  color: var(--sage);
+}
+
+.onboarding__heading {
+  margin: 0 0 12px;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--charcoal);
+  letter-spacing: -0.01em;
+}
+
+.onboarding__subtext {
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(58, 58, 58, 0.6);
+}
+
+.onboarding__input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: 16px; /* avoids iOS zoom-on-focus */
+  background: #FAF6F2;
+  margin-bottom: 24px;
+  font-family: inherit;
+  color: var(--charcoal);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.onboarding__input:focus {
+  outline: none;
+  border-color: var(--rose);
+}
+
+/* Stacked option cards (stage picker) */
+.onboarding__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.onboarding__option {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--charcoal);
+  transition: background 200ms ease, border-color 200ms ease;
+}
+.onboarding__option:hover {
+  background: var(--cream);
+}
+.onboarding__option:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 2px;
+}
+.onboarding__option--selected {
+  border: 2px solid var(--rose);
+  background: rgba(212, 165, 165, 0.08);
+  padding: 15px; /* compensate for thicker border so size doesn't jump */
+}
+.onboarding__option-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--charcoal);
+}
+.onboarding__option-desc {
+  font-size: 13px;
+  color: rgba(58, 58, 58, 0.6);
+}
+
+/* Actions: back link sits above the primary continue button */
+.onboarding__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.onboarding__back {
+  align-self: center;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: rgba(58, 58, 58, 0.6);
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 6px;
+  transition: color 200ms ease;
+}
+.onboarding__back:hover {
+  color: var(--charcoal);
+}
+.onboarding__back:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 2px;
+}
+
+.onboarding__continue {
+  width: 100%;
+  background: var(--rose);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 200ms ease;
+}
+.onboarding__continue:hover:not(:disabled) {
+  background: var(--rose-dark);
+}
+.onboarding__continue:disabled {
+  background: rgba(212, 165, 165, 0.5);
+  cursor: not-allowed;
+}
+.onboarding__continue:focus-visible {
+  outline: 2px solid var(--charcoal);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .onboarding__card {
+    padding: 24px 20px;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -3,6 +3,7 @@
 
 (function () {
   const KEY = 'easetrack_data';
+  const PROFILE_KEY = 'easetrack_profile';
 
   // Default shape returned when nothing is stored yet.
   function emptyStore() {
@@ -86,6 +87,25 @@
 
   function clearAll() {
     localStorage.removeItem(KEY);
+    localStorage.removeItem(PROFILE_KEY);
+  }
+
+  // ---------- Profile (set during onboarding) ----------
+  function getProfile() {
+    try {
+      const raw = localStorage.getItem(PROFILE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function setProfile(profile) {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  }
+
+  function clearProfile() {
+    localStorage.removeItem(PROFILE_KEY);
   }
 
   // Triggers a JSON file download of all data.
@@ -133,6 +153,9 @@
     updateSettings,
     clearAll,
     exportJSON,
-    importJSON
+    importJSON,
+    getProfile,
+    setProfile,
+    clearProfile
   };
 })();

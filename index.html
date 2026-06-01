@@ -9,9 +9,86 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css?v=2" />
 </head>
 <body>
+  <!-- ============== ONBOARDING OVERLAY (first run + edit profile) ============== -->
+  <div id="onboarding" class="onboarding" role="dialog" aria-modal="true" aria-labelledby="ob-heading" hidden>
+    <div class="onboarding__card">
+      <div class="onboarding__progress" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1" aria-label="Setup progress">
+        <span class="onboarding__pill onboarding__pill--filled" data-pill="1"></span>
+        <span class="onboarding__pill" data-pill="2"></span>
+        <span class="onboarding__pill" data-pill="3"></span>
+        <span class="onboarding__pill" data-pill="4"></span>
+      </div>
+
+      <!-- Screen 1 — Welcome -->
+      <section class="onboarding__screen" data-step="1">
+        <svg class="onboarding__icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M50 14 C 50 32, 36 50, 14 50 C 14 32, 28 14, 50 14 Z"/>
+          <path d="M14 50 L 38 26"/>
+        </svg>
+        <h2 id="ob-heading" class="onboarding__heading">Welcome to EaseTrack</h2>
+        <p class="onboarding__subtext">A calm, private space to track how you're feeling. Your data stays on your device — always.</p>
+        <div class="onboarding__actions">
+          <button class="onboarding__continue" data-action="next" type="button">Get started</button>
+        </div>
+      </section>
+
+      <!-- Screen 2 — Name -->
+      <section class="onboarding__screen" data-step="2" hidden>
+        <h2 class="onboarding__heading">What should we call you?</h2>
+        <p class="onboarding__subtext">Just a first name or nickname is fine.</p>
+        <label for="ob-name" class="visually-hidden">Your name</label>
+        <input id="ob-name" class="onboarding__input" type="text" maxlength="30" placeholder="Your name" autocomplete="given-name" required />
+        <div class="onboarding__actions">
+          <button class="onboarding__back" data-action="back" type="button">← Back</button>
+          <button class="onboarding__continue" data-action="next" type="button" disabled>Continue</button>
+        </div>
+      </section>
+
+      <!-- Screen 3 — Age -->
+      <section class="onboarding__screen" data-step="3" hidden>
+        <h2 class="onboarding__heading">How old are you?</h2>
+        <p class="onboarding__subtext">This helps us show relevant insights later. Optional.</p>
+        <label for="ob-age" class="visually-hidden">Your age</label>
+        <input id="ob-age" class="onboarding__input" type="number" min="30" max="80" placeholder="e.g. 48" inputmode="numeric" />
+        <div class="onboarding__actions">
+          <button class="onboarding__back" data-action="back" type="button">← Back</button>
+          <button class="onboarding__continue" data-action="next" type="button">Continue</button>
+        </div>
+      </section>
+
+      <!-- Screen 4 — Stage -->
+      <section class="onboarding__screen" data-step="4" hidden>
+        <h2 class="onboarding__heading">Which stage are you in?</h2>
+        <p class="onboarding__subtext">Pick the one that fits best. You can change this later in Settings.</p>
+        <div class="onboarding__options" role="radiogroup" aria-label="Menopause stage">
+          <button class="onboarding__option" type="button" role="radio" aria-checked="false" data-value="perimenopause">
+            <span class="onboarding__option-title">Perimenopause</span>
+            <span class="onboarding__option-desc">Periods becoming irregular, early symptoms</span>
+          </button>
+          <button class="onboarding__option" type="button" role="radio" aria-checked="false" data-value="menopause">
+            <span class="onboarding__option-title">Menopause</span>
+            <span class="onboarding__option-desc">12+ months since last period</span>
+          </button>
+          <button class="onboarding__option" type="button" role="radio" aria-checked="false" data-value="postmenopause">
+            <span class="onboarding__option-title">Postmenopause</span>
+            <span class="onboarding__option-desc">Well past menopause</span>
+          </button>
+          <button class="onboarding__option" type="button" role="radio" aria-checked="false" data-value="not_sure">
+            <span class="onboarding__option-title">Not sure</span>
+            <span class="onboarding__option-desc">I'd rather not say right now</span>
+          </button>
+        </div>
+        <div class="onboarding__actions">
+          <button class="onboarding__back" data-action="back" type="button">← Back</button>
+          <button class="onboarding__continue" data-action="finish" type="button" disabled>Finish setup</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
   <!-- Install banner -->
   <div id="install-banner" class="install-banner" hidden>
     <span class="install-banner__text">Install EaseTrack for quick access offline</span>
@@ -191,6 +268,16 @@
         <h2 id="settings-heading" class="screen-title">Settings</h2>
       </div>
 
+      <div class="card" id="profile-card">
+        <h3 class="card__title">Profile</h3>
+        <div class="profile-info">
+          <div class="profile-row"><span class="profile-row__label">Name</span><span id="profile-name">—</span></div>
+          <div class="profile-row"><span class="profile-row__label">Age</span><span id="profile-age">—</span></div>
+          <div class="profile-row"><span class="profile-row__label">Stage</span><span id="profile-stage">—</span></div>
+        </div>
+        <button id="edit-profile-btn" class="btn btn--secondary btn--full" style="margin-top: 12px;">Edit profile</button>
+      </div>
+
       <div class="card">
         <h3 class="card__title">Daily reminder</h3>
         <p class="card__hint">Optional gentle nudge to check in.</p>
@@ -282,9 +369,9 @@
 
   <!-- Chart.js via CDN (cached by SW after first load) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
-  <script src="js/storage.js" defer></script>
-  <script src="js/charts.js" defer></script>
-  <script src="js/reminders.js" defer></script>
-  <script src="js/app.js" defer></script>
+  <script src="js/storage.js?v=2" defer></script>
+  <script src="js/charts.js?v=2" defer></script>
+  <script src="js/reminders.js?v=2" defer></script>
+  <script src="js/app.js?v=2" defer></script>
 </body>
 </html>
